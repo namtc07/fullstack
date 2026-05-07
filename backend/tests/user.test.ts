@@ -14,6 +14,10 @@ describe("Kiểm thử API Người dùng", () => {
       password: "password123",
     });
 
+        console.log("CHI TIẾT LỖI 503:", response.body); // THÊM DÒNG NÀY
+
+        expect(response.status).toBe(201);
+
     // expect: Kỳ vọng kết quả trả về phải khớp 100%
     expect(response.status).toBe(201);
     expect(response.body.message).toBe("Đăng ký thành công!");
