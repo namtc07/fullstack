@@ -21,7 +21,7 @@ jobs:
     - name: Cài đặt Node.js
       uses: actions/setup-node@v3
       with:
-        node-version: '18.x'
+        node-version: '20.x'
         
     - name: Cài đặt thư viện
       working-directory: ./backend  # Thay bằng tên thư mục chứa package.json của bạn

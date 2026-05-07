@@ -19,9 +19,4 @@ mongoose
 // Gắn các API routes
 app.use("/api", userRoutes);
 
-// Khởi động server
-app.listen(env.port, () => {
-  console.log(`Server đang chạy tại http://localhost:${env.port}`);
-});
-
 export default app;
