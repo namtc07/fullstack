@@ -1,0 +1,30 @@
+name: Kiem Thu Tu Dong
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    # Khởi tạo một database ảo trên GitHub để chạy Integration Test
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Cài đặt Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+        
+    - name: Cài đặt thư viện
+      run: npm install
+      
+    - name: Chạy Test tự động
+      run: npm test
