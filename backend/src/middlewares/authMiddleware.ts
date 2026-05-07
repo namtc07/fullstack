@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { env } from "@/config/env";
 
 // Mở rộng kiểu dữ liệu Request của Express để chứa thêm thông tin user
 export interface AuthRequest extends Request {
@@ -26,8 +27,8 @@ export const verifyToken = (req: AuthRequest, res: Response, next: NextFunction)
   }
 
   try {
-    // Giải mã và xác thực token dựa trên 'chuoi_bi_mat'
-    const verified = jwt.verify(token, "chuoi_bi_mat");
+    // Giải mã và xác thực token bằng secret từ biến môi trường
+    const verified = jwt.verify(token, env.jwtSecret);
     req.user = verified;
     next(); // Token hợp lệ, cho phép đi tiếp vào hàm xử lý API (Controller)
   } catch (error) {

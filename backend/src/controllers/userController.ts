@@ -3,6 +3,7 @@ import User from "@/models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { env } from "@/config/env";
 
 const ensureDbConnected = (res: Response): boolean => {
   if (mongoose.connection.readyState !== 1) {
@@ -56,7 +57,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Cấp thẻ JWT chứa ID và Role, hạn sử dụng 1 giờ
-    const token = jwt.sign({ id: user._id, role: user.role }, "chuoi_bi_mat", { expiresIn: "1h" });
+    const token = jwt.sign({ id: user._id, role: user.role }, env.jwtSecret, { expiresIn: "1h" });
     res.json({ message: "Đăng nhập thành công!", token });
   } catch (error) {
     res.status(500).json({ error: "Lỗi khi đăng nhập" });
