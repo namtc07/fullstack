@@ -28,5 +28,9 @@ jobs:
       run: npm install
       
     - name: Chạy Test tự động
-      working-directory: ./backend  # Thay bằng tên thư mục chứa package.json của bạn
+      working-directory: ./backend
+      env: # Khai báo biến môi trường ảo dùng riêng cho lúc test
+        MONGO_URI: mongodb://localhost:27017/test_db
+        JWT_SECRET: secret_test_abc123
+        PORT: 8080
       run: npm test
