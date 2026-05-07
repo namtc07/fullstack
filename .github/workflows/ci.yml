@@ -24,7 +24,9 @@ jobs:
         node-version: '18.x'
         
     - name: Cài đặt thư viện
+      working-directory: ./backend  # Thay bằng tên thư mục chứa package.json của bạn
       run: npm install
       
     - name: Chạy Test tự động
+      working-directory: ./backend  # Thay bằng tên thư mục chứa package.json của bạn
       run: npm test
