@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-const requiredEnv = ["MONGO_URI", "JWT_SECRET"] as const;
+const requiredEnv = ["DATABASE_URL", "JWT_SECRET"] as const;
 
 for (const key of requiredEnv) {
   if (!process.env[key]) {
@@ -9,7 +9,7 @@ for (const key of requiredEnv) {
 }
 
 export const env = {
-  mongoUri: process.env.MONGO_URI as string,
+  databaseUrl: process.env.DATABASE_URL as string,
   jwtSecret: process.env.JWT_SECRET as string,
   port: Number(process.env.PORT) || 8080,
 };

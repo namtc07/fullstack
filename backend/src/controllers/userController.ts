@@ -1,34 +1,30 @@
 import { Request, Response } from "express";
-import User from "@/models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import { env } from "@/config/env";
-
-const ensureDbConnected = (res: Response): boolean => {
-  if (mongoose.connection.readyState !== 1) {
-    res.status(503).json({
-      error: "Database chưa kết nối",
-      hint: "Kiểm tra MongoDB Atlas Network Access (IP whitelist) rồi thử lại.",
-    });
-    return false;
-  }
-
-  return true;
-};
+import { prisma } from "@/lib/prisma";
 
 // Promise<void> báo cho TypeScript biết hàm này là bất đồng bộ và không trả về trực tiếp giá trị nào (chỉ dùng res.json)
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
-  if (!ensureDbConnected(res)) return;
-
   try {
     const { name, role, password } = req.body;
+
+    const existedUser = await prisma.user.findUnique({ where: { name } });
+    if (existedUser) {
+      res.status(400).json({ error: "Tên người dùng đã tồn tại" });
+      return;
+    }
 
     // Mã hóa mật khẩu với độ khó (salt) là 10
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ name, role, password: hashedPassword });
-    await newUser.save(); // Lưu vào MongoDB
+    await prisma.user.create({
+      data: {
+        name,
+        role: role || "user",
+        password: hashedPassword,
+      },
+    });
 
     res.status(201).json({ message: "Đăng ký thành công!" });
   } catch (error) {
@@ -37,11 +33,9 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 };
 
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  if (!ensureDbConnected(res)) return;
-
   try {
     const { name, password } = req.body;
-    const user = await User.findOne({ name });
+    const user = await prisma.user.findUnique({ where: { name } });
 
     // Xử lý nếu người dùng không tồn tại
     if (!user) {
@@ -57,7 +51,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Cấp thẻ JWT chứa ID và Role, hạn sử dụng 1 giờ
-    const token = jwt.sign({ id: user._id, role: user.role }, env.jwtSecret, { expiresIn: "1h" });
+    const token = jwt.sign({ id: user.id, role: user.role }, env.jwtSecret, { expiresIn: "1h" });
     res.json({ message: "Đăng nhập thành công!", token });
   } catch (error) {
     res.status(500).json({ error: "Lỗi khi đăng nhập" });
@@ -65,10 +59,14 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
-  if (!ensureDbConnected(res)) return;
-
   try {
-    const users = await User.find(); // Lấy toàn bộ dữ liệu
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        role: true,
+      },
+    });
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: "Lỗi khi lấy dữ liệu" });

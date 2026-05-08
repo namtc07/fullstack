@@ -1,7 +1,9 @@
 import request from "supertest";
 import app from "../src/app";
-import mongoose from "mongoose";
+import { PrismaClient } from "@prisma/client";
 import { describe, it, expect, afterAll } from "@jest/globals";
+
+const prisma = new PrismaClient();
 
 // describe: Nhóm các kịch bản test có liên quan lại với nhau
 describe("Kiểm thử API Người dùng", () => {
@@ -25,7 +27,7 @@ describe("Kiểm thử API Người dùng", () => {
 
   // afterAll: Chạy sau khi test xong để ngắt kết nối Database, tránh bị treo Terminal
   afterAll(async () => {
-    await mongoose.connection.close();
+    await prisma.$disconnect();
   });
 
   it("Nên lấy được danh sách user khi có token hợp lệ", async () => {
