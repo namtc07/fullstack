@@ -10,10 +10,14 @@ jobs:
     
     # Khởi tạo một database ảo trên GitHub để chạy Integration Test
     services:
-      mongodb:
-        image: mongo:latest
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: test_db
         ports:
-          - 27017:27017
+          - 5432:5432
 
     steps:
     - uses: actions/checkout@v3
@@ -29,8 +33,10 @@ jobs:
       
     - name: Chạy Test tự động
       working-directory: ./backend
-      env: # Khai báo biến môi trường ảo dùng riêng cho lúc test
-        MONGO_URI: mongodb://localhost:27017/test_db
+      env:
+        DATABASE_URL: postgresql://root:password@localhost:5432/test_db
         JWT_SECRET: secret_test_abc123
         PORT: 8080
-      run: npm test
+      run: |
+        npx prisma db push
+        npm test
