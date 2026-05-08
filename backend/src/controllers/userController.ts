@@ -72,3 +72,12 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ error: "Lỗi khi lấy dữ liệu" });
   }
 };
+
+export const uploadAvatar = (req: Request, res: Response): void => {
+  if (!req.file) {
+    res.status(400).json({ error: "Vui lòng chọn một file ảnh!" });
+    return;
+  }
+  // Trả về đường dẫn của file vừa upload
+  res.json({ message: "Upload thành công!", fileUrl: `/uploads/${req.file.filename}` });
+};
